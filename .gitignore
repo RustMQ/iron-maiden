@@ -1,2 +1,7 @@
+bin/
+pkg/
+
 iron-maiden
+iron-maiden.exe
 iron.json
+influx.json

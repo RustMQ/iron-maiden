@@ -6,7 +6,7 @@ import (
 	"net/url"
 	"time"
 
-	influxClient "github.com/influxdb/influxdb/client"
+	influxClient "github.com/influxdata/influxdb/client"
 	"github.com/rcrowley/go-metrics"
 )
 
