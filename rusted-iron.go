@@ -8,7 +8,7 @@ import (
 )
 
 var (
-	rustedIronURI = "http://localhost:8000/queue/1"
+	rustedIronURI = "http://localhost:8000"
 )
 
 type Msg struct {
@@ -21,12 +21,36 @@ type Reservation struct {
 
 type RustedIronRunner struct{}
 
-func (rir *RustedIronRunner) setupQueues(queues []string) {}
+func (ir *RustedIronRunner) setupQueues(queues []string) {
+	// qs, err := mq.List()
+	// for _, q := range qs {
+	// 	log.Println("[INFO] deleting queues")
+	// 	err = q.Delete()
+	// 	if err != nil {
+	// 		log.Println("delete err", err)
+	// 	}
+	// }
+	putQueueURI := rustedIronURI
+	putQueueURI += "/queue"
+	b := new(bytes.Buffer)
+
+	for _, q := range queues {
+		putURI := putQueueURI
+		putURI += "/" + q
+		req, err := http.NewRequest(http.MethodPut, putURI, b)
+		req.Header.Add("Content-Type", "application/json")
+		_, err = http.DefaultClient.Do(req)
+		if err != nil {
+			log.Println("err", err)
+		}
+	}
+}
 
 func (rir *RustedIronRunner) Name() string { return "RustedIronMQ" }
 
 func (rir *RustedIronRunner) Produce(name, body string, messages int) {
 	produceURI := rustedIronURI
+	produceURI += "/queue/" + name
 	produceURI += "/messages"
 
 	msgs := make([]Msg, messages)
@@ -47,6 +71,7 @@ func (rir *RustedIronRunner) Produce(name, body string, messages int) {
 
 func (rir * RustedIronRunner) Consume(name string, messages int) {
 	reserveURI := rustedIronURI
+	reserveURI += "/queue/" + name
 	reserveURI += "/reservations"
 	reservationBody := Reservation{messages}
 
