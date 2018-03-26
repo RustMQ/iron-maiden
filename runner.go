@@ -94,6 +94,7 @@ func prodAndConsume(mqs []MQRunner, messages, atATime, threadperQ, queues, bytes
 	baseName = fmt.Sprintf("%d_%d_%d_%d", args[0], args[1], args[3], args[4])
 	qnames := qnames(queues)
 	for _, mq := range mqs {
+		fmt.Println(mq.Name()+":", "started at:", time.Now().UTC());
 		fmt.Println(mq.Name()+":", "concurrency benchmark with", messages, "message(s),",
 			atATime, "at a time, across", queues, "queue(s) using ", bytes, "bytes")
 
@@ -111,6 +112,7 @@ func prodAndConsume(mqs []MQRunner, messages, atATime, threadperQ, queues, bytes
 		}()
 		wait.Wait()
 		fmt.Println("producer and consumer took", time.Since(then))
+		fmt.Println(mq.Name()+":", "completed at:", time.Now().UTC());
 	}
 }
 

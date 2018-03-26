@@ -3,12 +3,12 @@ package main
 import (
 	"bytes"
 	"encoding/json"
-	"net/http"
 	"log"
+	"net/http"
 )
 
 var (
-	rustedIronURI = "http://localhost:8000"
+	rustedIronURI = "http://localhost:8080"
 )
 
 type Msg struct {
@@ -17,6 +17,7 @@ type Msg struct {
 
 type Reservation struct {
 	N int `json:"n"`
+	Delete bool `json:"delete"`
 }
 
 type RustedIronRunner struct{}
@@ -31,7 +32,7 @@ func (ir *RustedIronRunner) setupQueues(queues []string) {
 	// 	}
 	// }
 	putQueueURI := rustedIronURI
-	putQueueURI += "/queue"
+	putQueueURI += "/queues"
 	b := new(bytes.Buffer)
 
 	for _, q := range queues {
@@ -50,7 +51,7 @@ func (rir *RustedIronRunner) Name() string { return "RustedIronMQ" }
 
 func (rir *RustedIronRunner) Produce(name, body string, messages int) {
 	produceURI := rustedIronURI
-	produceURI += "/queue/" + name
+	produceURI += "/queues/" + name
 	produceURI += "/messages"
 
 	msgs := make([]Msg, messages)
@@ -65,15 +66,15 @@ func (rir *RustedIronRunner) Produce(name, body string, messages int) {
 		"application/json; charset=utf-8",
 		b)
 	if err != nil {
-		log.Println(err);
+		log.Println(err)
 	}
 }
 
-func (rir * RustedIronRunner) Consume(name string, messages int) {
+func (rir *RustedIronRunner) Consume(name string, messages int) {
 	reserveURI := rustedIronURI
-	reserveURI += "/queue/" + name
+	reserveURI += "/queues/" + name
 	reserveURI += "/reservations"
-	reservationBody := Reservation{messages}
+	reservationBody := Reservation{N: messages, Delete: true}
 
 	b := new(bytes.Buffer)
 	json.NewEncoder(b).Encode(reservationBody)
@@ -83,6 +84,6 @@ func (rir * RustedIronRunner) Consume(name string, messages int) {
 		"application/json; charset=utf-8",
 		b)
 	if err != nil {
-		log.Println(err);
+		log.Println(err)
 	}
 }
