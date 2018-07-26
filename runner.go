@@ -57,7 +57,7 @@ func main() {
 	runtime.GOMAXPROCS(runtime.NumCPU())
 	var mqs []MQRunner
 	//mqs = append(mqs, new(IronRunner), new(RabbitRunner))
-	mqs = append(mqs, new(RabbitRunner))
+	mqs = append(mqs, new(IronRunner), new(RustedIronRunner))
 
 	if len(os.Args) < 6 {
 		fmt.Println("usage: ./iron-maiden [message_count] [messages_per_batch] [threads_per_queue] [amount_of_queues] [message_size]")
@@ -71,7 +71,7 @@ func main() {
 		args = append(args, i)
 	}
 
-	prodAndConsume(mqs, args[0], args[1], args[2], args[3], args[4])
+	prodThenConsume(mqs, args[0], args[1], args[2], args[3], args[4])
 	metrics.WriteOnce(metrics.DefaultRegistry, os.Stdout)
 }
 
